@@ -2,9 +2,7 @@ package com.vr.cms.api;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -31,6 +29,10 @@ public class GenerateLocalServerId extends HttpServlet {
 		return uuids;
 	}
 
+	public static void setUuids(Set<String> uuids) {
+		GenerateLocalServerId.uuids = uuids;
+	}
+
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
@@ -51,10 +53,20 @@ public class GenerateLocalServerId extends HttpServlet {
 		String token = request.getParameter("token");
 		if (!Utility.isStringEmpty(token) && validate(token)) {
 			String serverId = null;
-			serverId = generateUserIds();
+			try {
+				serverId = generateUserIds();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			// try {
+			// DBManager.getDBManager().saveServerId(serverId);
+			// } catch (SQLException e) {
+			// e.printStackTrace();
+			// }
+
 			response.getWriter().append(serverId);
 			System.out.println("GenerateUserId:Server Id  " + serverId);
-			System.out.println("Total servers : " + uuids);
 		}
 	}
 
@@ -62,10 +74,10 @@ public class GenerateLocalServerId extends HttpServlet {
 		return token.equals("xxxx");
 	}
 
-	private String generateUserIds() {
+	public static String generateUserIds() throws SQLException {
 		UUID uuid = UUID.randomUUID();
 		String userId = uuid.toString();
-		if (!uuids.contains(userId)) {
+		if (!DBManager.getDBManager().getServerIds().contains(userId)) {
 			uuids.add(userId);
 		} else {
 			generateUserIds();

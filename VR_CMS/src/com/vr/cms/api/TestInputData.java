@@ -16,8 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class AddOrUpdateVideo
  */
-@WebServlet(description = "AddOrUpdateVideo", urlPatterns = { "/addOrUpdateVideo" })
-public class AddOrUpdateVideo extends HttpServlet {
+@WebServlet(description = "TestInputData", urlPatterns = { "/testInputData" })
+public class TestInputData extends HttpServlet {
 
 	/**
 	 * 
@@ -27,7 +27,7 @@ public class AddOrUpdateVideo extends HttpServlet {
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public AddOrUpdateVideo() {
+	public TestInputData() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -50,30 +50,26 @@ public class AddOrUpdateVideo extends HttpServlet {
 		String videoDir = request.getParameter("videoDir");
 		String description = request.getParameter("description");
 		String listOfServers = request.getParameter("serverList");
-
-		System.out.println("name : " + name + ", type : " + type + ",category : " + category + ", imageName : "
-				+ imageName + ", imageDir : " + imageDir + ", videoName " + videoName + ", videoDir : " + videoDir
-				+ ", description : " + description + ", serverList : " + listOfServers);
-
-		if (Utility.isStringEmpty(name) || Utility.isStringEmpty(type) || Utility.isStringEmpty(category)
-				|| Utility.isStringEmpty(imageName) || Utility.isStringEmpty(imageDir)
-				|| Utility.isStringEmpty(videoName) || Utility.isStringEmpty(videoDir)
-				|| Utility.isStringEmpty(description)) {
-			response.getWriter().append("One or More Required input is Empty");
-		} else {
-			System.out.println("inside saving video");
-			List<String> serverList = null;
-			System.out.println(listOfServers);
-			if (!Utility.isStringEmpty(listOfServers)) {
-				String[] servers = listOfServers.split(",");
-				serverList = Arrays.asList(servers);
-				System.out.println("Saving new video");
-				VideoMetadata newVideo = addVideo(name, type, category, imageName, imageDir, videoName, videoDir,
-						description, serverList);
-				System.out.println("AddOrUpdateVideo: Videos  " + Videos.getUserIdToVideos());
-				response.getWriter().append("Served at: ").append(request.getContextPath()).append(newVideo.toString());
-			}
-		}
+		System.out.println("Data received "+name+":"+type+":"+category);
+//		if (Utility.isStringEmpty(name) || Utility.isStringEmpty(type) || Utility.isStringEmpty(category)
+//				|| Utility.isStringEmpty(imageName) || Utility.isStringEmpty(imageDir)
+//				|| Utility.isStringEmpty(videoName) || Utility.isStringEmpty(videoDir)
+//				|| Utility.isStringEmpty(description)) {
+//			response.getWriter().append("One or More Required input is Empty");
+//		} else {
+//			System.out.println("inside saving video");
+//			List<String> serverList = null;
+//			System.out.println(listOfServers);
+//			if (!Utility.isStringEmpty(listOfServers)) {
+//				String[] servers = listOfServers.split(",");
+//				serverList = Arrays.asList(servers);
+//				System.out.println("Saving new video");
+//				VideoMetadata newVideo = addVideo(name, type, category, imageName, imageDir, videoName, videoDir,
+//						description, serverList);
+//				System.out.println("AddOrUpdateVideo: Videos  " + Videos.getUserIdToVideos());
+//				response.getWriter().append("Served at: ").append(request.getContextPath()).append(newVideo.toString());
+//			}
+//		}
 	}
 
 	private VideoMetadata addVideo(String name, String type, String category, String imageName, String imageDir,
@@ -85,6 +81,7 @@ public class AddOrUpdateVideo extends HttpServlet {
 		try {
 			id = DBManager.getDBManager().addVideo(newVideo, serverList);
 		} catch (SQLException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		newVideo.setId(id);

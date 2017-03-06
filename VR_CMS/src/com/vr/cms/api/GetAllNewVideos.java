@@ -1,6 +1,7 @@
 package com.vr.cms.api;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,18 +46,18 @@ public class GetAllNewVideos extends HttpServlet {
 		String serverId = request.getParameter("serverId");
 		String lastUpdatedTime = request.getParameter("lastUpdatedTime");
 		if (!Utility.isStringEmpty(serverId) && !Utility.isStringEmpty(lastUpdatedTime)) {
-			if (isValidServerId(serverId)) {
-				Map<Long, VideoMetadata> videoList = Videos.getListOfVideos(serverId);
-				if (Utility.isNotNullOrEmpty(videoList)) {
+			try {
+				if (isValidServerId(serverId)) {
 					List<VideoMetadata> list = new ArrayList<>();
-					for (Map.Entry<Long, VideoMetadata> entry : videoList.entrySet()) {
-						if (entry.getKey() > Long.parseLong(lastUpdatedTime)) {
-							list.add(entry.getValue());
-						}
-					}
+					list = DBManager.getDBManager().getAllNewVideos(serverId, lastUpdatedTime);
 					System.out.println("GetAllVideos : json.toJson(list)  " + json.toJson(list));
 					response.getWriter().append(json.toJson(list));
+				} else {
+					response.getWriter().append("Served at: ").append(request.getContextPath())
+							.append("  Error: Invalid serverId or Server noto registered");
 				}
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
 		} else {
 			response.getWriter().append("Served at: ").append(request.getContextPath())
@@ -65,9 +66,9 @@ public class GetAllNewVideos extends HttpServlet {
 
 	}
 
-	private boolean isValidServerId(String serverId) {
-		System.out.println(GenerateLocalServerId.getUuids());
-		return GenerateLocalServerId.getUuids().contains(serverId);
+	private boolean isValidServerId(String serverId) throws SQLException {
+		System.out.println(DBManager.getDBManager().getServerIds());
+		return DBManager.getDBManager().getServerIds().contains(serverId);
 	}
 
 	/**
