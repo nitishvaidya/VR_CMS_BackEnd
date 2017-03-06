@@ -21,7 +21,7 @@ public class DBManager {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/vr_master_server?autoReconnect=true", "root",
-					"streamphony");
+					"Stream_Phony0");
 			System.out.println("**************DB Connection Succesfull***************" + con);
 			updateAllMapsFromDB();
 		} catch (Exception e) {

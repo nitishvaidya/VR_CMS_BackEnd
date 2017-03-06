@@ -1,3 +1,5 @@
+use vr_master_server;
+
 drop table server_ids;
 create table server_ids(
 `id` Integer not null AUTO_INCREMENT,
