@@ -1,3 +1,5 @@
+
+create database vr_master_server;
 use vr_master_server;
 
 drop table server_ids;

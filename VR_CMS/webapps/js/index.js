@@ -1,7 +1,21 @@
 $(document).ready(
 		function() {
 
-			var url = "http://192.168.1.100:5050/VR_CMS";
+			var url = "http://143.89.144.156:5050/VR_CMS";
+
+			$.ajax({
+				type : "GET",
+				url : url + "/getAllSchools",
+				dataType : "json",
+				success : function(data) {
+					for (var i = 0; i < data.length; i++) {
+						var div_data = "<option value=" + data[i].serverId
+								+ ">" + data[i].schoolName + "</option>";
+						$(div_data).appendTo('#serverList');
+
+					}
+				}
+			});
 
 			$('#contact_form').bootstrapValidator({
 				// To use feedback icons, ensure that
@@ -46,10 +60,10 @@ $(document).ready(
 							}
 						}
 					},
-					imageDir : {
+					imageUpload : {
 						validators : {
 							notEmpty : {
-								message : 'Please enter image directory'
+								message : 'Please upload image'
 							}
 						}
 					},
@@ -63,10 +77,10 @@ $(document).ready(
 							}
 						}
 					},
-					videoDir : {
+					videoUpload : {
 						validators : {
 							notEmpty : {
-								message : 'Please enter video directory'
+								message : 'Please upload video'
 							}
 						}
 					},
@@ -82,11 +96,78 @@ $(document).ready(
 
 			$('#video_upload_btn').click(
 					function() {
-						$.post($('#contact_form').attr('action',
-								url + "/addOrUpdateVideo"), $('#contact_form')
-								.serialize(), function(result) {
-							console.log(result);
-						}, 'json');
+						var fileImage = document.getElementById('file-image');
+						var imagefile = fileImage.files;
+
+						var fileVideo = document.getElementById('file-video');
+						var videofile = fileVideo.files;
+						var formData = new FormData();
+						formData.append('name',
+								document.getElementById('name').value);
+						formData.append('type',
+								document.getElementById('type').value);
+						formData.append('category', document
+								.getElementById('category').value);
+						formData.append('imageName', document
+								.getElementById('imageName').value);
+						formData.append('videoName', document
+								.getElementById('videoName').value);
+						formData.append('description', document
+								.getElementById('description').value);
+						formData.append('image', imagefile[0],
+								imagefile[0].name);
+						formData.append('video', videofile[0],
+								videofile[0].name);
+						formData.append('serverList', $('#serverList').val());
+
+						var xhr = new XMLHttpRequest();
+
+						(xhr.upload || xhr).addEventListener('progress',
+								function(e) {
+									var done = e.position || e.loaded
+									var total = e.totalSize || e.total;
+									var percentage = Math.round(done / total
+											* 100);
+									console.log('xhr progress: ' + percentage
+											+ '%');
+									$('.progress-bar').css('width',
+											percentage + '%').attr(
+											'aria-valuenow', percentage);
+
+								});
+
+						xhr.open('POST', url + '/addOrUpdateVideo', true);
+						xhr.timeout = 4000000;
+						xhr.onload = function(res) {
+							if (xhr.status === 200) {
+								console.log('connection made' + res);
+								hidePleaseWait();
+							} else {
+								alert('An error occurred!');
+							}
+						};
+						xhr.error = function(error) {
+							console.log(error);
+						}
+						xhr.send(formData);
+						var pleaseWait = $('#pleaseWaitDialog');
+
+						showPleaseWait = function() {
+							pleaseWait.modal('show');
+						};
+
+						hidePleaseWait = function() {
+							pleaseWait.modal('hide');
+						};
+
+						showPleaseWait();
+						// $.post($('#contact_form').attr('action',
+						// url + "/addOrUpdateVideo"), $(
+						// '#contact_form').serialize(),
+						// function(
+						// result) {
+						// console.log(result);
+						// }, 'json');
 						console.log($('#contact_form').serialize());
 					});
 

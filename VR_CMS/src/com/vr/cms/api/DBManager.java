@@ -5,9 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -84,9 +82,24 @@ public class DBManager {
 
 	}
 
+	public List<SchoolServer> getAllSchools() throws SQLException {
+		System.out.println(con);
+		Statement stmt = con.createStatement();
+		List<SchoolServer> serverIds = new ArrayList<SchoolServer>();
+		ResultSet res = stmt.executeQuery("select server_id,school_name from server_ids");
+		while (res.next()) {
+			SchoolServer schoolServer = new SchoolServer(res.getString("server_id"), res.getString("school_name"));
+			serverIds.add(schoolServer);
+		}
+
+		System.out.println(serverIds);
+
+		return serverIds;
+
+	}
+
 	public int addVideo(VideoMetadata video, List<String> serverIds) throws SQLException {
 		Statement stmt = con.createStatement();
-		int[] col = new int[1];
 		System.out.println(
 				"insert into videos (name,type,category,imageName,imageDir,videoName,videoDir,description,timestamp) values("
 						+ "\'" + video.getName() + "\'" + "," + "\'" + video.getType() + "\'" + "," + "\'"
@@ -117,8 +130,10 @@ public class DBManager {
 						"insert into servers_to_videos(server_id,video_id) values((select id from server_ids where server_id = "
 								+ "\'" + serverId + "\'" + ")," + autoIncKeyFromApi + ")");
 			}
-			int[] count = stmt.executeBatch();
 		}
+
+		stmt.executeBatch();
+
 		return autoIncKeyFromApi;
 
 	}
